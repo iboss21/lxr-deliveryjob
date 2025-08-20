@@ -2,7 +2,7 @@ Config = {}
 
 Config.Debug = true
 
-Config.Core = "RSG" --- RSG | VORP (WIP)
+Config.Core = "RSG" --- RSG | VORP
 
 Config.Interact = "prompt" --- prompt | target (WIP) | murphy_interact (WIP)
 
@@ -1279,5 +1279,6 @@ Config.Deliveries = {
             },
         },
     },
+
 
 }
