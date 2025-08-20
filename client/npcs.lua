@@ -75,4 +75,10 @@ AddEventHandler("onResourceStop", function(resourceName)
     for i = 1, #blipEntries do
         RemoveBlip(blipEntries[i].Blip)
     end
+    if Config.Interact == "murphy_interact" then
+        for _, loc in pairs(Config.Deliveries) do 
+            exports.murphy_interact:RemoveInteraction('DeliveryID'.. _)
+        end
+    end
 end)
+

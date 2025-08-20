@@ -4,7 +4,7 @@ Config.Debug = true
 
 Config.Core = "RSG" --- RSG | VORP
 
-Config.Interact = "prompt" --- prompt | target (WIP) | murphy_interact (WIP)
+Config.Interact = "prompt" --- prompt | murphy_interact | target (WIP)
 
 --- NPC Settings
 Config.DistanceSpawn = 30.0
@@ -1282,3 +1282,4 @@ Config.Deliveries = {
 
 
 }
+
