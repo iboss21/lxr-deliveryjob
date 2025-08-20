@@ -25,8 +25,28 @@ lib.callback.register('stx-wagondeliveries:server:callback:givePlayerReward', fu
         end
 
     elseif Config.Core == "VORP" then
-        --- Needs to be written
+        local Core = exports.vorp_core:GetCore()
+        local inventory = exports.vorp_inventory
+        local User = Core.getUser(src)
+        if User then
+            local Character = User.getUsedCharacter
+            Character.addCurrency(Config.Reward_Money_Account, rewardmoney)
+            TriggerClientEvent("stx-wagondeliveries:client:cancelDelivery", src, false)
+            if data2.reward.itemreward.activation then
+                if data2.reward.itemreward.chance ~= nil then
+                    local chance = math.random(1, 100)
+                    if chance >= data2.reward.itemreward.chance then
+                        inventory:addItem(src, data2.reward.itemreward.itemname, data2.reward.itemreward.itemamount)
+                        Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. RSGCore.Shared.Items[data2.reward.itemreward.itemname].label)
+                    end
+                else
+                    inventory:addItem(src, data2.reward.itemreward.itemname, data2.reward.itemreward.itemamount)
+                    Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. RSGCore.Shared.Items[data2.reward.itemreward.itemname].label)
+                end
 
+            end
+            return true
+        end
     end
     return nil
 
