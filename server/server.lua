@@ -30,6 +30,7 @@ lib.callback.register('stx-wagondeliveries:server:callback:givePlayerReward', fu
         local User = Core.getUser(src)
         if User then
             local Character = User.getUsedCharacter
+            local itemLabel = exports.vorp_inventory:getItemDB(data2.reward.itemreward.itemname, callback).label
             Character.addCurrency(Config.Reward_Money_Account, rewardmoney)
             TriggerClientEvent("stx-wagondeliveries:client:cancelDelivery", src, false)
             if data2.reward.itemreward.activation then
@@ -37,11 +38,11 @@ lib.callback.register('stx-wagondeliveries:server:callback:givePlayerReward', fu
                     local chance = math.random(1, 100)
                     if chance >= data2.reward.itemreward.chance then
                         inventory:addItem(src, data2.reward.itemreward.itemname, data2.reward.itemreward.itemamount)
-                        Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. RSGCore.Shared.Items[data2.reward.itemreward.itemname].label)
+                        Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. itemLabel)
                     end
                 else
                     inventory:addItem(src, data2.reward.itemreward.itemname, data2.reward.itemreward.itemamount)
-                    Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. RSGCore.Shared.Items[data2.reward.itemreward.itemname].label)
+                    Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. itemLabel)
                 end
 
             end
@@ -49,5 +50,5 @@ lib.callback.register('stx-wagondeliveries:server:callback:givePlayerReward', fu
         end
     end
     return nil
-
 end)
+
