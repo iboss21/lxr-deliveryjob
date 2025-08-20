@@ -1,0 +1,33 @@
+math.randomseed(GetGameTimer())
+
+lib.callback.register('stx-wagondeliveries:server:callback:givePlayerReward', function(source, rewardmoney, data2)
+    local src = source
+    if Config.Core == "RSG" then
+        local RSGCore = exports['rsg-core']:GetCoreObject()
+        local Player = RSGCore.Functions.GetPlayer(src)
+        if Player then
+            Player.Functions.AddMoney(Config.Reward_Money_Account, rewardmoney, 'Delivery Wagon Payment')
+            TriggerClientEvent("stx-wagondeliveries:client:cancelDelivery", src, false)
+            if data2.reward.itemreward.activation then
+                if data2.reward.itemreward.chance ~= nil then
+                    local chance = math.random(1, 100)
+                    if chance >= data2.reward.itemreward.chance then
+                        Player.Functions.AddItem(data2.reward.itemreward.itemname, data2.reward.itemreward.itemamount)
+                        Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. RSGCore.Shared.Items[data2.reward.itemreward.itemname].label)
+                    end
+                else
+                    Player.Functions.AddItem(data2.reward.itemreward.itemname, data2.reward.itemreward.itemamount)
+                    Config.Notify_Server(src, "Delivery", "You received an item reward : "..data2.reward.itemreward.itemamount.. "x ".. RSGCore.Shared.Items[data2.reward.itemreward.itemname].label)
+                end
+
+            end
+            return true
+        end
+
+    elseif Config.Core == "VORP" then
+        --- Needs to be written
+
+    end
+    return nil
+
+end)
