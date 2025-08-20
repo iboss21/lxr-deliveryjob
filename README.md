@@ -36,7 +36,7 @@ Players can choose a **delivery destination** from available towns, deliver cart
 
 - RedM server (latest build)
 - One of the following frameworks [RSG FRAMEWORK](https://github.com/Rexshack-RedM) or [VORP FRAMEWORK](https://github.com/VORPCORE)
-- Major dependency : (ox_lib)[https://github.com/Rexshack-RedM/ox_lib)
+- Major dependency : [ox_lib](https://github.com/Rexshack-RedM/ox_lib)
 
 ## Credits
 - Major creds goes to [RexShack](https://github.com/RexShack) for making rsg-delivery
