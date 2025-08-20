@@ -37,8 +37,7 @@ if Config.Interact == "prompt" then
             end
 
             if showPrompt then
-                local label = CreateVarString(10, 'LITERAL_STRING', labelText)
-                UiPromptSetActiveGroupThisFrame(promptGroup, label)
+                UiPromptSetActiveGroupThisFrame(promptGroup)
                 if UiPromptHasHoldModeCompleted(prompt) then
                     TriggerEvent('stx-wagondeliveries:client:open_delivery_menu', dataDelivery)
                     Wait(1000) -- prevent spamming
@@ -46,4 +45,24 @@ if Config.Interact == "prompt" then
             end
         end
     end)
-end
+elseif Config.Interact == "murphy_interact" then 
+    CreateThread(function()
+            for _, dataDelivery in pairs(Config.Deliveries) do 
+                exports.murphy_interact:AddInteraction({
+                    coords = dataDelivery.npccoords.xyz,
+                    distance = 3.0, -- optional
+                    interactDst = 2.0, -- optional
+                    id = 'DeliveryID'.. _, -- needed for removing interactions
+                    name = 'DeliveryJob'.. _, -- optional
+                    options = {
+                         {
+                            label = 'Check Deliveries',
+                            action = function(entity, coords, args)
+                                TriggerEvent('stx-wagondeliveries:client:open_delivery_menu', dataDelivery)
+                            end,
+                        },
+                    }
+                })
+            end
+    end)
+end 
