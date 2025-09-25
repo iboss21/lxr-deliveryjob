@@ -1,0 +1,1 @@
+CreateThread(function() while true do Wait(2000); if Config.Stealth.lightForbidden then local veh=GetVehiclePedIsIn(PlayerPedId(),false); if veh~=0 and Citizen.InvokeNative(0xC4CFCE4C656EF480,veh) then TriggerServerEvent('lxr:supreme:stealth',false); if lib and lib.notify then lib.notify({title='Stealth',description=locale('stealth_breach'),type='error'}) end end end end end)

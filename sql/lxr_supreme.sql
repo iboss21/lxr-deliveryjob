@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS `lxr_supreme` (`identifier` varchar(64) NOT NULL, `level` int NOT NULL DEFAULT 0, `xp` int NOT NULL DEFAULT 0, `reputation` int NOT NULL DEFAULT 0, PRIMARY KEY (`identifier`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

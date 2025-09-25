@@ -1,0 +1,2 @@
+local keyEnter=0xC7B5340A;local function help(m) DisplayHelpTextThisFrame(m,false) end
+CreateThread(function() while true do local sleep=750; local p=GetEntityCoords(PlayerPedId()); for i,b in ipairs(Config.Boards) do local d=#(p-b.coords); if d<25.0 then sleep=0; DrawMarker(1,b.coords.x,b.coords.y,b.coords.z-1.0,0,0,0,0,0,0,0.6,0.6,0.3,255,255,255,80,false,false,2,false,nil,nil,false); if d<1.8 then help(locale('board_open')); if IsControlJustPressed(0,keyEnter) then TriggerEvent('lxr:supreme:openBoard',i) end end end end Wait(sleep) end end)

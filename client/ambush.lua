@@ -1,4 +1,2 @@
--- Ambush spawner (client). Extend with bandit AI and player choices.
-RegisterNetEvent("lux:delivery:client:ambush", function(kind, count)
-    -- TODO: spawn 'count' hostile peds based on Config.Factions[kind]
-end)
+RegisterNetEvent('lxr:supreme:ambush',function() local p=GetEntityCoords(PlayerPedId()); local f=GetEntityForwardVector(PlayerPedId()); local base=p+f*24.0; local models={}; for _,m in ipairs(Config.Ambush.banditModels) do models[#models+1]=joaat(m) end; for i=1,math.random(2,4) do local off=vector3(base.x+math.random(-8,8),base.y+math.random(-8,8),base.z); local model=models[math.random(1,#models)]; RequestModel(model) while not HasModelLoaded(model) do Wait(0) end; local ped=CreatePed(model,off.x,off.y,off.z,0.0,true,false,0,0); GiveWeaponToPed_2(ped,joaat('WEAPON_REPEATER_CARBINE'),150,true,true,0,false,0.0,0.0,0.0,true); SetPedAccuracy(ped,Config.Ambush.accuracy or 20); TaskCombatPed(ped,PlayerPedId(),0,16) end; if lib and lib.notify then lib.notify({title='Ambush!',description=locale('ambush'),type='error'}) end end)
+CreateThread(function() while true do if Config.Ambush.enabled and math.random(1,100)<=Config.Ambush.baseChancePerMinute then TriggerEvent('lxr:supreme:ambush') end Wait(60000) end end)
