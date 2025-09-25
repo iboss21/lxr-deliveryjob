@@ -1,48 +1,37 @@
-# Stx Wagon Deliveries
-<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/b3038f26-ae9b-4018-ad4d-16308324c037" />
+# lux-mission-delivery
 
+Mission-based delivery system for **RedM** supporting **LXRCore**, **RSGCore**, and **VORP** via a framework adapter.
 
-A **RedM roleplay script** that allows players to take wagon/cart delivery jobs.  
-Players can choose a **delivery destination** from available towns, deliver carts/wagons, and earn rewards. 
----
+## Highlights
+- Narrative mission board(s) with risk tiers, stealth runs, and escorts (hooks included).
+- Dynamic payouts: distance × risk × demand – with cargo damage penalties.
+- Player progression (levels + perks) with KVP or `oxmysql` storage.
+- Highly configurable; Georgian `ge.lua` locale included.
+- Clean adapters for money/items; fill in LXR-specific calls if your build differs.
 
-## ✨ Features
-
-- ✅ Supports **RSGCore** & **VORP** frameworks  
-- ✅ Supports [**Murphy Interaction**](https://github.com/levraimurphy/murphy_interact) 
-- ✅ Selectable **delivery destinations**  
-- ✅ Configurable rewards
-
-## ✨ Previews
-<img width="574" height="677" alt="image" src="https://github.com/user-attachments/assets/5ba87932-82bc-4ee1-81af-e1980b5bfd0f" />
-<img width="558" height="660" alt="image" src="https://github.com/user-attachments/assets/b263d03c-61e6-4899-b7f8-b3dc2a349fda" />
-
----
-
-## 📦 Installation
-
-1. **Download or Clone** this repository into your RedM `resources` folder:
-   ```bash
-   resources/[yourfolder]/stx-wagondeliveries
-   ```
-2. Ensure the script if not ensured
+## Install
+1. Ensure `ox_lib` and (optionally) `oxmysql` are started before this resource.
+2. Drop the folder into your resources and add to `server.cfg`:
    ```cfg
-   ensure stx-wagondeliveries
+   ensure lux-mission-delivery
    ```
-3. Configure the script in shared/config.lua
-  - Delivery locations
-  - Reward settings
+3. If using MySQL:
+   - Set `Config.Progression.storageMode = "oxmysql"` in `shared/config.lua`.
+   - Import `sql/lux_delivery.sql`.
+4. Pick your framework in `shared/config.lua` or leave `AUTO` for detection.
 
-## 📚 Dependencies
+> **Reminder**: This resource includes the required RedM prerelease warning in `fxmanifest.lua` per your preference.
 
-- RedM server (latest build)
-- One of the following frameworks [RSG FRAMEWORK](https://github.com/Rexshack-RedM) or [VORP FRAMEWORK](https://github.com/VORPCORE)
-- Major dependency : [ox_lib](https://github.com/Rexshack-RedM/ox_lib)
-- Optional: [**Murphy Interaction**](https://github.com/levraimurphy/murphy_interact) 
-## Credits
-- Major creds goes to [RexShack](https://github.com/RexShack) for making rsg-delivery
+## Framework Notes
+- **RSGCore**: uses `GetCoreObject()` and `Player.Functions.AddMoney/AddItem`.
+- **VORP**: uses `vorp_core` exports; currency account name comes from `Config.MoneyAccount`.
+- **LXRCore**: map your money/item APIs in `shared/framework.lua` (placeholders included).
 
----
-## Support
+## Commands
+- `/canceldelivery` — abort current mission.
 
-- [Join Discord](https://discord.gg/fPjSxEHFMt)
+## Extend
+- Add ambush AI logic in `client/ambush.lua`.
+- Add stealth/law detection and weather handling tweaks in `client/events.lua`.
+- Add more boards/missions in `shared/config.lua`.
+
