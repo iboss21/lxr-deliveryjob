@@ -107,10 +107,12 @@ local function spawn_cart_with_gps_mission(data1, data2)
     endcoords = vector3(data2.deliveryLoc.x, data2.deliveryLoc.y, data2.deliveryLoc.z)
     
     -- Create destination blip on map
-    deliveryBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, endcoords.x, endcoords.y, endcoords.z)  -- BlipAddForCoords
-    SetBlipSprite(deliveryBlip, joaat('blip_destination'), true)  -- Set destination icon
-    SetBlipScale(deliveryBlip, 0.2)
-    Citizen.InvokeNative(0x9CB1A1623062F402, deliveryBlip, 'Delivery Point')  -- SetBlipName
+    -- Native 0x554D9D53F696D002 = BlipAddForCoords
+    -- Parameter 1664425300 = blip hash for coordinate-based blips
+    deliveryBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, endcoords.x, endcoords.y, endcoords.z)
+    SetBlipSprite(deliveryBlip, joaat(Config.Blip.deliveryBlipSprite), true)
+    SetBlipScale(deliveryBlip, Config.Blip.deliveryBlipScale)
+    Citizen.InvokeNative(0x9CB1A1623062F402, deliveryBlip, Config.Blip.deliveryBlipName)  -- SetBlipName
     
     -- Set up GPS route to destination
     StartGpsMultiRoute(GetHashKey("COLOR_RED"), true, true)
