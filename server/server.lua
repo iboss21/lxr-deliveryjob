@@ -95,7 +95,12 @@ end
     @return: true if successful, false otherwise
 ]]--
 local function giveRewards(src, money, route)
-    if not money or money <= 0 then return false end
+    local hasItemReward = route and route.reward and route.reward.itemreward and route.reward.itemreward.activation
+    
+    -- Need at least money or item reward
+    if (not money or money <= 0) and not hasItemReward then 
+        return false 
+    end
 
     -- RSGCore Framework Integration
     if Config.Core == "RSG" then
@@ -103,7 +108,10 @@ local function giveRewards(src, money, route)
         local Player = RSGCore.Functions.GetPlayer(src)
         if not Player then return false end
 
-        Player.Functions.AddMoney(Config.Reward_Money_Account, money, 'Delivery Wagon Payment')
+        -- Give money reward if amount is greater than 0
+        if money and money > 0 then
+            Player.Functions.AddMoney(Config.Reward_Money_Account, money, 'Delivery Wagon Payment')
+        end
 
         -- Give item reward if configured
         if route and route.reward and route.reward.itemreward and route.reward.itemreward.activation then
@@ -136,7 +144,10 @@ local function giveRewards(src, money, route)
         local Character = User.getUsedCharacter
         if not Character then return false end
 
-        Character.addCurrency(Config.Reward_Money_Account, money)
+        -- Give money reward if amount is greater than 0
+        if money and money > 0 then
+            Character.addCurrency(Config.Reward_Money_Account, money)
+        end
 
         -- Give item reward if configured
         if route and route.reward and route.reward.itemreward and route.reward.itemreward.activation then
@@ -202,10 +213,13 @@ lib.callback.register('stx-wagondeliveries:server:callback:startDelivery', funct
         return false
     end
 
-    local reward = calculateReward(loc, route)
-    if not reward or reward <= 0 then
+    local reward = calculateReward(loc, route) or 0
+    
+    -- Check if there's at least some reward (money OR items)
+    local hasItemReward = route.reward and route.reward.itemreward and route.reward.itemreward.activation
+    if reward <= 0 and not hasItemReward then
         if Config.Debug then
-            print(("^3[DELIVERY] Player %d has invalid reward calculation^0"):format(src))
+            print(("^3[DELIVERY] Player %d has invalid reward configuration (no money or item rewards)^0"):format(src))
         end
         return false
     end
