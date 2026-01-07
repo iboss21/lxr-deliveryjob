@@ -60,6 +60,18 @@ Config.RandomDelivery = true
 Config.RandomDelivery_HideDestinationText = true
 Config.RandomDelivery_HideRewardPreview = true
 
+--- Anti-Spam / Anti-Exploit Settings
+Config.AntiSpam = {
+    -- Maximum allowed menu opens within the detection window
+    maxMenuOpens = 3,
+    -- Time window (in seconds) to track menu opens
+    detectionWindow = 10,
+    -- Cooldown duration (in seconds) after spam is detected
+    cooldownDuration = 60,
+    -- Server-side rate limit for delivery starts (seconds between attempts)
+    serverRateLimit = 5,
+}
+
 -----
 --- To enable itemreward chance just add number ex: chance = 10,
 --- To disable itemreward chance just make it nil ex: chance = nil,
