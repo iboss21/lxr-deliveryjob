@@ -91,7 +91,18 @@ end
     @return: true if item rewards are configured and active, false otherwise
 ]]--
 local function hasItemReward(route)
-    return route and route.reward and route.reward.itemreward and route.reward.itemreward.activation
+    return route and route.reward and route.reward.itemreward and route.reward.itemreward.activation == true
+end
+
+--[[
+    Check if there is at least one valid reward (money or items)
+    @param money: Money amount (can be nil, 0, or positive)
+    @param route: Route configuration
+    @return: true if at least one reward type is valid, false otherwise
+]]--
+local function hasValidReward(money, route)
+    -- Valid if money > 0 OR item rewards are configured
+    return (money and money > 0) or hasItemReward(route)
 end
 
 --[[
@@ -105,7 +116,7 @@ end
 ]]--
 local function giveRewards(src, money, route)
     -- Need at least money or item reward
-    if (not money or money <= 0) and not hasItemReward(route) then 
+    if not hasValidReward(money, route) then 
         return false 
     end
 
@@ -232,7 +243,7 @@ lib.callback.register('stx-wagondeliveries:server:callback:startDelivery', funct
     end
     
     -- Check if there's at least some reward (money OR items)
-    if reward <= 0 and not hasItemReward(route) then
+    if not hasValidReward(reward, route) then
         if Config.Debug then
             print(("^3[DELIVERY] Player %d has no rewards configured (no money or item rewards)^0"):format(src))
         end
