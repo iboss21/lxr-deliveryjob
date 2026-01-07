@@ -3,6 +3,7 @@ math.randomseed(GetGameTimer())
 -- Anti-exploit delivery sessions (per-player)
 -- Goal: keep the same UI / interaction, but only pay ONCE, at the delivery point.
 local Sessions = {}
+local LastDeliveryAttempt = {} -- Track last delivery start attempt per player
 
 local function v3(x, y, z)
     return vector3(tonumber(x) or 0.0, tonumber(y) or 0.0, tonumber(z) or 0.0)
@@ -114,29 +115,57 @@ end
 -- Called when client starts a delivery (right after spawning the wagon)
 lib.callback.register('stx-wagondeliveries:server:callback:startDelivery', function(source, payload)
     local src = source
+    local now = os.time()
+
+    -- Check server-side rate limit
+    if LastDeliveryAttempt[src] then
+        local timeSinceLastAttempt = now - LastDeliveryAttempt[src]
+        if timeSinceLastAttempt < Config.AntiSpam.serverRateLimit then
+            if Config.Debug then
+                print(("^3[DELIVERY] Player %d attempted to start delivery too quickly (%.1fs since last attempt)^0"):format(src, timeSinceLastAttempt))
+            end
+            return false
+        end
+    end
 
     -- Already in a delivery? refuse.
     if Sessions[src] and Sessions[src].active then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d already has an active delivery^0"):format(src))
+        end
         return false
     end
 
     local loc, route = findConfiguredRoute(payload)
     if not loc or not route then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d sent invalid delivery configuration^0"):format(src))
+        end
         return false
     end
 
     local reward = calculateReward(loc, route)
     if not reward or reward <= 0 then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d has invalid reward calculation^0"):format(src))
+        end
         return false
     end
+
+    -- Update rate limit tracker
+    LastDeliveryAttempt[src] = now
 
     Sessions[src] = {
         active = true,
         paid = false,
         reward = reward,
         route = route,
-        startedAt = os.time(),
+        startedAt = now,
     }
+
+    if Config.Debug then
+        print(("^2[DELIVERY] Player %d started delivery - Reward: $%.2f^0"):format(src, reward))
+    end
 
     return reward
 end)
@@ -145,16 +174,41 @@ end)
 lib.callback.register('stx-wagondeliveries:server:callback:completeDelivery', function(source)
     local src = source
     local s = Sessions[src]
+    
     if not s or not s.active then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d attempted to complete delivery without active session^0"):format(src))
+        end
         return false
     end
+    
     if s.paid then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d attempted to complete already-paid delivery (exploit attempt blocked)^0"):format(src))
+        end
+        return false
+    end
+
+    -- Additional validation: check if enough time has passed since start
+    local deliveryDuration = os.time() - s.startedAt
+    if deliveryDuration < Config.AntiSpam.minDeliveryDuration then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d completed delivery too quickly (%.1fs) - possible exploit^0"):format(src, deliveryDuration))
+        end
         return false
     end
 
     s.paid = true
 
     local ok = giveRewards(src, s.reward, s.route)
+
+    if Config.Debug then
+        if ok then
+            print(("^2[DELIVERY] Player %d completed delivery - Paid: $%.2f - Duration: %ds^0"):format(src, s.reward, deliveryDuration))
+        else
+            print(("^1[DELIVERY] Player %d failed to receive rewards^0"):format(src))
+        end
+    end
 
     -- Always end the session after a completion attempt to prevent replays.
     Sessions[src] = nil
@@ -165,11 +219,18 @@ end)
 -- Explicit cancel from client
 RegisterNetEvent('stx-wagondeliveries:server:cancelDelivery', function()
     local src = source
+    if Config.Debug and Sessions[src] then
+        print(("^3[DELIVERY] Player %d cancelled delivery^0"):format(src))
+    end
     Sessions[src] = nil
 end)
 
 -- Cleanup on disconnect (prevents ethernet abuse / reconnect payout)
 AddEventHandler('playerDropped', function()
     local src = source
+    if Config.Debug and Sessions[src] then
+        print(("^3[DELIVERY] Player %d disconnected with active delivery - session cleaned up^0"):format(src))
+    end
     Sessions[src] = nil
+    LastDeliveryAttempt[src] = nil
 end)

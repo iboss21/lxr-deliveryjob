@@ -6,6 +6,7 @@ local endcoords = nil
 local tempdata2 = nil
 local tempamount = nil
 local isCompleting = false
+local lastDeliveryAttempt = 0 -- Timestamp of last delivery start attempt
 
 function DrawText3D(x, y, z, text)
     local onScreen,_x,_y=GetScreenCoordFromWorldCoord(x, y, z)
@@ -81,14 +82,24 @@ RegisterNetEvent("stx-wagondeliveries:client:open_delivery_menu", function(deliv
             {
                 title = "Start Delivery",
                 description = "A random destination will be assigned.",
-                disabled = isDeliveryStarted, -- უკვე თუ დაწყებულია, აღარ აძლევს
+                disabled = isDeliveryStarted,
                 onSelect = function()
                     if isDeliveryStarted then
                         Config.Notify_Client("Delivery", "A delivery is already in progress.", "error", 3500)
                         return
                     end
 
-                    -- ✅ IMPORTANT: we pass nil route to force random inside startDelivery
+                    -- Check client-side rate limit
+                    local now = GetGameTimer()
+                    local timeSinceLastAttempt = (now - lastDeliveryAttempt) / 1000
+                    if timeSinceLastAttempt < Config.AntiSpam.serverRateLimit then
+                        local waitTime = math.ceil(Config.AntiSpam.serverRateLimit - timeSinceLastAttempt)
+                        Config.Notify_Client("Delivery", "Please wait " .. waitTime .. " seconds before starting another delivery.", "error", 3500)
+                        return
+                    end
+
+                    lastDeliveryAttempt = now
+
                     TriggerEvent("stx-wagondeliveries:client:startDelivery", deliverydata, nil)
                     lib.hideContext(true)
                 end
