@@ -1,24 +1,75 @@
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    The Land of Wolves - LXRCore Delivery System
+    Configuration File
+    
+    Developer: iBoss
+    Website: www.wolves.land
+    Discord: discord.gg/fPjSxEHFMt
+    
+    Original Creator: Muhammad Abdullah Shurjeel (stx-wagondeliveries)
+    Based on: RexShack's rsg-delivery
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
 Config = {}
 
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    GENERAL SETTINGS
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
+-- Enable debug mode for console logging (useful for troubleshooting)
 Config.Debug = false
 
-Config.Core = "RSG" --- RSG | VORP
+-- Framework Selection: Choose your server framework
+-- Options: "RSG" (RSGCore) or "VORP" (VORP Framework)
+Config.Core = "RSG"
 
-Config.Interact = "murphy_interact" --- prompt | murphy_interact | target (WIP)
+-- Interaction System: Choose how players interact with delivery NPCs
+-- Options: "prompt" (native RedM prompts) | "murphy_interact" (Murphy Interaction) | "target" (WIP - not yet implemented)
+Config.Interact = "murphy_interact"
 
---- NPC Settings
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    NPC SETTINGS
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
+-- Distance at which NPCs will spawn around the player (in game units)
 Config.DistanceSpawn = 30.0
+
+-- Enable smooth fade-in effect when NPCs spawn/despawn
 Config.FadeIn = true
 
----- Blip Settings
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    BLIP (MAP MARKER) SETTINGS
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
 Config.Blip = {
-    blipName = 'Wagon Hauling Corporation',           
-    blipSprite = 'blip_ambient_coach', 
+    -- Name displayed on the map for delivery locations
+    blipName = 'The Land of Wolves - Wagon Hauling',
+    
+    -- Sprite/icon used for the blip on the map
+    blipSprite = 'blip_ambient_coach',
+    
+    -- Size of the blip icon (0.1 = small, 1.0 = large)
     blipScale = 0.2
 }
 
----- Notification Settings (BLN_NOTIFY)
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    NOTIFICATION SYSTEM
+    
+    This section handles all in-game notifications to players.
+    Uses BLN_NOTIFY system for consistent messaging across the server.
+═══════════════════════════════════════════════════════════════════════════════
+]]--
 
+-- Internal helper function to convert notification types to BLN templates
 local function _blnTemplateFromType(notitype)
     notitype = (notitype or "info"):lower()
     if notitype == "success" then return "SUCCESS" end
@@ -27,6 +78,11 @@ local function _blnTemplateFromType(notitype)
     return "INFO"
 end
 
+-- Client-side notification function
+-- @param title: Notification title
+-- @param text: Notification message content
+-- @param notitype: Type of notification ("success", "error", "warning", "info")
+-- @param duration: How long notification displays (in milliseconds)
 Config.Notify_Client = function(title, text, notitype, duration)
     TriggerEvent('bln_notify:send', {
         title = title or '',
@@ -37,6 +93,12 @@ Config.Notify_Client = function(title, text, notitype, duration)
     }, _blnTemplateFromType(notitype))
 end
 
+-- Server-side notification function (sends to specific player)
+-- @param id: Player server ID to send notification to
+-- @param title: Notification title
+-- @param text: Notification message content
+-- @param notitype: Type of notification ("success", "error", "warning", "info")
+-- @param duration: How long notification displays (in milliseconds)
 Config.Notify_Server = function(id, title, text, notitype, duration)
     TriggerClientEvent('bln_notify:send', id, {
         title = title or '',
@@ -47,65 +109,169 @@ Config.Notify_Server = function(id, title, text, notitype, duration)
     }, _blnTemplateFromType(notitype))
 end
 
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    DELIVERY SYSTEM CONFIGURATION
+═══════════════════════════════════════════════════════════════════════════════
+]]--
 
---- Main delivery Config
+-- Account type for money rewards
+-- RSG options: "cash", "bank"
+-- VORP options: 0 (cash), 1 (gold)
 Config.Reward_Money_Account = "cash"
 
+-- Command players can use to cancel active deliveries
 Config.CancelDelivery_Command = "canceldelivery"
-Config.Show_Reward_Money_inMenu = false -- To show reward money inside deliveries menu
 
--- Random delivery mode (player cannot choose destination)
+-- Show reward amount in the delivery selection menu
+-- Set to false to hide payment amounts from players
+Config.Show_Reward_Money_inMenu = false
+
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    RANDOM DELIVERY MODE
+    
+    When enabled, destinations are randomly assigned instead of player choice.
+    This creates more variety and prevents players from always choosing the 
+    highest-paying routes.
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
+-- Enable random destination assignment (players cannot choose)
 Config.RandomDelivery = true
--- Hide destination names and reward previews in menus/notifications
+
+-- Hide destination names in menus and notifications
 Config.RandomDelivery_HideDestinationText = true
+
+-- Hide reward amount previews before delivery completion
 Config.RandomDelivery_HideRewardPreview = true
 
---- Anti-Spam / Anti-Exploit Settings
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    ANTI-SPAM & ANTI-EXPLOIT SETTINGS
+    
+    These settings prevent players from abusing the delivery system through:
+    - Menu spam attacks
+    - Rapid delivery completion exploits
+    - Instant teleport/completion cheats
+    - Server load from excessive requests
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
 Config.AntiSpam = {
-    -- Maximum allowed menu opens within the detection window
+    -- Maximum number of times a player can open the delivery menu within the detection window
+    -- If exceeded, player is put on cooldown
     maxMenuOpens = 3,
-    -- Time window (in seconds) to track menu opens
+    
+    -- Time window (in seconds) to track menu open attempts
+    -- Example: 3 menu opens within 10 seconds = spam detected
     detectionWindow = 10,
+    
     -- Cooldown duration (in seconds) after spam is detected
+    -- Player cannot open menu again until cooldown expires
     cooldownDuration = 60,
-    -- Server-side rate limit for delivery starts (seconds between attempts)
+    
+    -- Server-side rate limit for starting deliveries (seconds between attempts)
+    -- Prevents rapid-fire delivery starts that could exploit the system
     serverRateLimit = 5,
-    -- Minimum delivery duration to prevent instant completion exploits (seconds)
+    
+    -- Minimum time (in seconds) a delivery must take to be valid
+    -- Prevents instant completion exploits (teleporting to destination)
+    -- Adjust based on your map size and typical delivery times
     minDeliveryDuration = 10,
 }
 
------
---- To enable itemreward chance just add number ex: chance = 10,
---- To disable itemreward chance just make it nil ex: chance = nil,
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    DELIVERY LOCATIONS & ROUTES CONFIGURATION
+    
+    This is where you define all delivery locations, NPCs, and routes.
+    
+    STRUCTURE:
+    - Each main location has its own NPC and cart spawn point
+    - Each location can have multiple delivery routes to other towns
+    - Rewards can be based on distance OR fixed prices
+    - Item rewards can be given with optional chance percentage
+    
+    REWARD SYSTEM EXPLAINED:
+    
+    priceByDistance: 
+        - activation: true/false (enable distance-based rewards)
+        - multiplier: Payment per 100 units of distance
+        - Example: 1000 units @ 0.01 multiplier = $10
+    
+    priceByConfig:
+        - activation: true/false (enable fixed price rewards)
+        - price: Fixed amount paid for completing delivery
+    
+    itemreward:
+        - activation: true/false (enable item rewards)
+        - itemname: Item to give (must exist in your framework)
+        - itemamount: Number of items to give (can use math.random for variety)
+        - chance: Percentage chance (1-100), or nil for guaranteed reward
+        
+    NOTE: Only ONE price method should be active at a time (distance OR config)
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
 Config.Deliveries = {
+    --[[
+        VALENTINE DELIVERY HUB
+        Main delivery location in Valentine with routes to multiple towns
+    ]]--
     {
+        -- Display name for this delivery hub
         label = "Valentine Deliveries",
+        
+        -- NPC model that players interact with
         npcmodel = "MP_U_M_M_TRADER_01",
+        
+        -- NPC spawn coordinates (x, y, z, heading)
         npccoords = vector4(-340.5837, 816.3152, 116.9300, 136.7859),
+        
+        -- Where the delivery cart/wagon spawns
         cartSpawn = vector4(-347.9996, 815.5305, 116.7226, 168.6349),
+        
+        -- Available delivery routes from this location
         deliveries = {
             {
+                -- Route display name
                 label = "Blackwater Delivery",
+                
+                -- Route description
                 description = "From Valentine to Blackwater",
+                
+                -- Reward configuration
                 reward = {
+                    -- Distance-based payment (recommended for realistic economy)
                     priceByDistance = {
-                        activation = true,
-                        multiplier = 0.0,
+                        activation = true,  -- Enable distance-based payment
+                        multiplier = 0.0,   -- $ per 100 units (0.0 = disabled in favor of item rewards)
                     },
+                    -- Fixed price payment (alternative to distance-based)
                     priceByConfig = {
-                        activation = false,
+                        activation = false, -- Disabled (using distance or items instead)
                         price = 1.0,
                     },
+                    -- Item reward (alternative or additional to money)
                     itemreward = {
-                        activation = true,
-                        itemname = "dollar",
-                        itemamount = math.random(7, 11),
-                        chance = nil,
+                        activation = true,           -- Enable item rewards
+                        itemname = "dollar",         -- Item to give (must exist in your items config)
+                        itemamount = math.random(7, 11), -- Random amount between 7-11
+                        chance = nil,                -- nil = always give, number = % chance
                     },
                 },
+                
+                -- Cart/wagon model to spawn
                 wagonModel = "cart01",
+                
+                -- Cargo prop attached to wagon
                 cargo = "pg_teamster_cart01_breakables",
+                
+                -- Light upgrade prop attached to wagon
                 light = "pg_teamster_cart01_lightupgrade3",
+                
+                -- Delivery destination coordinates (where player must deliver)
                 deliveryLoc = vector3(-750.20, -1206.24, 43.33),
             },
             {

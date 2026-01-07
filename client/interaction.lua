@@ -1,11 +1,34 @@
--- Anti-spam tracking for menu interactions
-local menuOpenAttempts = {}
-local menuCooldownUntil = 0
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    The Land of Wolves - LXRCore Delivery System
+    Interaction Handler
+    
+    Developer: iBoss
+    Website: www.wolves.land
+    
+    This script handles:
+    - Player interaction with delivery NPCs
+    - Menu anti-spam protection
+    - Support for multiple interaction methods (prompt/murphy_interact)
+═══════════════════════════════════════════════════════════════════════════════
+]]--
 
+-- Anti-spam tracking for menu interactions
+local menuOpenAttempts = {}  -- Timestamps of recent menu open attempts
+local menuCooldownUntil = 0  -- Timestamp when cooldown expires
+
+-- Check if player is currently in cooldown
+-- @return: true if in cooldown, false otherwise
 local function isInCooldown()
     return GetGameTimer() < menuCooldownUntil
 end
 
+--[[
+    Track Menu Open Attempt
+    Monitors menu opening to detect spam behavior
+    Implements a sliding window spam detection system
+    @return: true if spam detected, false if OK
+]]--
 local function trackMenuOpen()
     local now = GetGameTimer()
     local detectionWindowMs = Config.AntiSpam.detectionWindow * 1000
@@ -32,6 +55,13 @@ local function trackMenuOpen()
     return false -- No spam
 end
 
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    NATIVE PROMPT INTERACTION SYSTEM
+    Uses RedM's built-in prompt system for player interactions
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
 if Config.Interact == "prompt" then
     local promptGroup = GetRandomIntInRange(0, 0x7FFFFFFF)
     local prompt
@@ -39,6 +69,7 @@ if Config.Interact == "prompt" then
     local labelText = "Check Deliveries"
     local promptRadius = 2.0
 
+    -- Register prompt for delivery menu
     local function registerPrompts()
         local newPrompt = PromptRegisterBegin()
         PromptSetControlAction(newPrompt, promptKey)
@@ -51,6 +82,7 @@ if Config.Interact == "prompt" then
         return newPrompt
     end
 
+    -- Main prompt loop
     CreateThread(function()
         prompt = registerPrompts()
 
@@ -62,6 +94,7 @@ if Config.Interact == "prompt" then
             local showPrompt = false
             local dataDelivery = nil
 
+            -- Check if player is near any delivery NPC
             for _, loc in pairs(Config.Deliveries) do
                 if #(coords - loc.npccoords.xyz) < promptRadius then
                     showPrompt = true
@@ -70,14 +103,17 @@ if Config.Interact == "prompt" then
                 end
             end
 
+            -- Show prompt and handle interaction
             if showPrompt then
                 UiPromptSetActiveGroupThisFrame(promptGroup)
                 if UiPromptHasHoldModeCompleted(prompt) then
+                    -- Check cooldown
                     if isInCooldown() then
                         local remainingSeconds = math.ceil((menuCooldownUntil - GetGameTimer()) / 1000)
                         Config.Notify_Client("Delivery", "Please wait " .. remainingSeconds .. " seconds before accessing the menu again.", "error", 3500)
                         Wait(1000)
                     else
+                        -- Track this attempt for spam detection
                         if trackMenuOpen() then
                             Config.Notify_Client("Delivery", "Spam detected! Menu access blocked for " .. Config.AntiSpam.cooldownDuration .. " seconds.", "error", 5000)
                             Wait(1000)
@@ -90,33 +126,44 @@ if Config.Interact == "prompt" then
             end
         end
     end)
-elseif Config.Interact == "murphy_interact" then 
+
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    MURPHY INTERACTION SYSTEM
+    Uses Murphy's Interaction script for 3D interactions
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
+elseif Config.Interact == "murphy_interact" then
     CreateThread(function()
-            for _, dataDelivery in pairs(Config.Deliveries) do 
-                exports.murphy_interact:AddInteraction({
-                    coords = dataDelivery.npccoords.xyz,
-                    distance = 3.0, -- optional
-                    interactDst = 2.0, -- optional
-                    id = 'DeliveryID'.. _, -- needed for removing interactions
-                    name = 'DeliveryJob'.. _, -- optional
-                    options = {
-                         {
-                            label = 'Check Deliveries',
-                            action = function(entity, coords, args)
-                                if isInCooldown() then
+        -- Register interaction points for each delivery location
+        for _, dataDelivery in pairs(Config.Deliveries) do
+            exports.murphy_interact:AddInteraction({
+                coords = dataDelivery.npccoords.xyz,
+                distance = 3.0,      -- Detection distance
+                interactDst = 2.0,   -- Interaction distance
+                id = 'DeliveryID'.. _, 
+                name = 'DeliveryJob'.. _,
+                options = {
+                    {
+                        label = 'Check Deliveries',
+                        action = function(entity, coords, args)
+                            -- Check cooldown
+                            if isInCooldown() then
                                     local remainingSeconds = math.ceil((menuCooldownUntil - GetGameTimer()) / 1000)
-                                    Config.Notify_Client("Delivery", "Please wait " .. remainingSeconds .. " seconds before accessing the menu again.", "error", 3500)
+                                Config.Notify_Client("Delivery", "Please wait " .. remainingSeconds .. " seconds before accessing the menu again.", "error", 3500)
+                            else
+                                -- Track this attempt for spam detection
+                                if trackMenuOpen() then
+                                    Config.Notify_Client("Delivery", "Spam detected! Menu access blocked for " .. Config.AntiSpam.cooldownDuration .. " seconds.", "error", 5000)
                                 else
-                                    if trackMenuOpen() then
-                                        Config.Notify_Client("Delivery", "Spam detected! Menu access blocked for " .. Config.AntiSpam.cooldownDuration .. " seconds.", "error", 5000)
-                                    else
-                                        TriggerEvent('stx-wagondeliveries:client:open_delivery_menu', dataDelivery)
-                                    end
+                                    TriggerEvent('stx-wagondeliveries:client:open_delivery_menu', dataDelivery)
                                 end
-                            end,
-                        },
-                    }
-                })
-            end
+                            end
+                        end,
+                    },
+                }
+            })
+        end
     end)
 end

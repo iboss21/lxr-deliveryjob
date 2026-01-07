@@ -1,21 +1,50 @@
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    The Land of Wolves - LXRCore Delivery System
+    Server-Side Script
+    
+    Developer: iBoss
+    Website: www.wolves.land
+    
+    This script handles:
+    - Server-side delivery validation
+    - Anti-exploit delivery sessions (one active delivery per player)
+    - Reward calculations and distribution
+    - Framework integration (RSG/VORP)
+    - Rate limiting and spam prevention
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
 math.randomseed(GetGameTimer())
 
--- Anti-exploit delivery sessions (per-player)
--- Goal: keep the same UI / interaction, but only pay ONCE, at the delivery point.
+-- Delivery session tracking (per-player)
+-- Prevents exploits: only ONE active delivery per player, paid ONCE at completion
 local Sessions = {}
-local LastDeliveryAttempt = {} -- Track last delivery start attempt per player
 
+-- Track last delivery start attempt per player (for rate limiting)
+local LastDeliveryAttempt = {}
+
+-- Helper: Create vector3 from x,y,z values
 local function v3(x, y, z)
     return vector3(tonumber(x) or 0.0, tonumber(y) or 0.0, tonumber(z) or 0.0)
 end
 
+-- Helper: Check if two positions are within tolerance distance
+-- @param a, b: Positions to compare (must have x, y, z fields)
+-- @param tol: Tolerance distance (default 0.25)
+-- @return: true if positions match within tolerance
 local function closeEnough(a, b, tol)
     tol = tol or 0.25
     return #(v3(a.x, a.y, a.z) - v3(b.x, b.y, b.z)) <= tol
 end
 
--- Find the exact configured main location + delivery route from the payload.
--- This prevents clients from inventing routes/rewards.
+--[[
+    Find Configured Route
+    Validates that the client's delivery request matches a real configured route
+    This prevents clients from inventing fake routes or manipulating rewards
+    @param payload: Client-provided delivery data (npc, cartSpawn, deliveryLoc, wagonModel)
+    @return: Main location config, Route config (or nil, nil if invalid)
+]]--
 local function findConfiguredRoute(payload)
     if not payload or not payload.npc or not payload.cartSpawn or not payload.deliveryLoc or not payload.wagonModel then
         return nil, nil
@@ -34,6 +63,13 @@ local function findConfiguredRoute(payload)
     return nil, nil
 end
 
+--[[
+    Calculate Reward
+    Determines payment amount based on distance or fixed price config
+    @param loc: Main location config
+    @param route: Specific route config
+    @return: Reward amount or nil if invalid
+]]--
 local function calculateReward(loc, route)
     if not loc or not route or not route.reward then return nil end
 
@@ -49,9 +85,19 @@ local function calculateReward(loc, route)
     return nil
 end
 
+--[[
+    Give Rewards
+    Distributes money and item rewards to player based on framework
+    Supports both RSGCore and VORP frameworks
+    @param src: Player server ID
+    @param money: Money amount to give
+    @param route: Route config (contains item reward info)
+    @return: true if successful, false otherwise
+]]--
 local function giveRewards(src, money, route)
     if not money or money <= 0 then return false end
 
+    -- RSGCore Framework Integration
     if Config.Core == "RSG" then
         local RSGCore = exports['rsg-core']:GetCoreObject()
         local Player = RSGCore.Functions.GetPlayer(src)
@@ -59,6 +105,7 @@ local function giveRewards(src, money, route)
 
         Player.Functions.AddMoney(Config.Reward_Money_Account, money, 'Delivery Wagon Payment')
 
+        -- Give item reward if configured
         if route and route.reward and route.reward.itemreward and route.reward.itemreward.activation then
             local item = route.reward.itemreward
             local function addItem()
@@ -67,18 +114,20 @@ local function giveRewards(src, money, route)
                 Config.Notify_Server(src, "Delivery", ("You received an item reward : %sx %s"):format(item.itemamount, label))
             end
 
+            -- Check if chance-based reward
             if item.chance ~= nil then
                 local chance = math.random(1, 100)
                 if chance >= item.chance then
                     addItem()
                 end
             else
-                addItem()
+                addItem() -- Guaranteed reward
             end
         end
 
         return true
 
+    -- VORP Framework Integration
     elseif Config.Core == "VORP" then
         local Core = exports.vorp_core:GetCore()
         local inventory = exports.vorp_inventory
@@ -89,6 +138,7 @@ local function giveRewards(src, money, route)
 
         Character.addCurrency(Config.Reward_Money_Account, money)
 
+        -- Give item reward if configured
         if route and route.reward and route.reward.itemreward and route.reward.itemreward.activation then
             local item = route.reward.itemreward
             local function addItem()
@@ -96,13 +146,14 @@ local function giveRewards(src, money, route)
                 Config.Notify_Server(src, "Delivery", ("You received an item reward : %sx %s"):format(item.itemamount, item.itemname))
             end
 
+            -- Check if chance-based reward
             if item.chance ~= nil then
                 local chance = math.random(1, 100)
                 if chance >= item.chance then
                     addItem()
                 end
             else
-                addItem()
+                addItem() -- Guaranteed reward
             end
         end
 
@@ -112,7 +163,14 @@ local function giveRewards(src, money, route)
     return false
 end
 
--- Called when client starts a delivery (right after spawning the wagon)
+--[[
+    Start Delivery Callback
+    Called when client starts a delivery (right after spawning the wagon)
+    Validates request, enforces rate limits, creates delivery session
+    @param source: Player server ID
+    @param payload: Client-provided delivery data
+    @return: Reward amount if valid, false if rejected
+]]--
 lib.callback.register('stx-wagondeliveries:server:callback:startDelivery', function(source, payload)
     local src = source
     local now = os.time()
@@ -170,7 +228,13 @@ lib.callback.register('stx-wagondeliveries:server:callback:startDelivery', funct
     return reward
 end)
 
--- Called when client parks wagon at the delivery point
+--[[
+    Complete Delivery Callback
+    Called when client parks wagon at the delivery point
+    Validates session, checks timing, distributes rewards
+    @param source: Player server ID
+    @return: true if successful and paid, false if rejected
+]]--
 lib.callback.register('stx-wagondeliveries:server:callback:completeDelivery', function(source)
     local src = source
     local s = Sessions[src]
@@ -216,7 +280,10 @@ lib.callback.register('stx-wagondeliveries:server:callback:completeDelivery', fu
     return ok
 end)
 
--- Explicit cancel from client
+--[[
+    Cancel Delivery Event
+    Explicit cancel from client - cleans up delivery session
+]]--
 RegisterNetEvent('stx-wagondeliveries:server:cancelDelivery', function()
     local src = source
     if Config.Debug and Sessions[src] then
@@ -225,7 +292,10 @@ RegisterNetEvent('stx-wagondeliveries:server:cancelDelivery', function()
     Sessions[src] = nil
 end)
 
--- Cleanup on disconnect (prevents ethernet abuse / reconnect payout)
+--[[
+    Player Disconnect Handler
+    Cleanup on disconnect to prevent ethernet abuse / reconnect payout exploits
+]]--
 AddEventHandler('playerDropped', function()
     local src = source
     if Config.Debug and Sessions[src] then
