@@ -86,6 +86,15 @@ local function calculateReward(loc, route)
 end
 
 --[[
+    Check if route has active item rewards
+    @param route: Route configuration
+    @return: true if item rewards are configured and active, false otherwise
+]]--
+local function hasItemReward(route)
+    return route and route.reward and route.reward.itemreward and route.reward.itemreward.activation
+end
+
+--[[
     Give Rewards
     Distributes money and item rewards to player based on framework
     Supports both RSGCore and VORP frameworks
@@ -95,10 +104,8 @@ end
     @return: true if successful, false otherwise
 ]]--
 local function giveRewards(src, money, route)
-    local hasItemReward = route and route.reward and route.reward.itemreward and route.reward.itemreward.activation
-    
     -- Need at least money or item reward
-    if (not money or money <= 0) and not hasItemReward then 
+    if (not money or money <= 0) and not hasItemReward(route) then 
         return false 
     end
 
@@ -114,7 +121,7 @@ local function giveRewards(src, money, route)
         end
 
         -- Give item reward if configured
-        if route and route.reward and route.reward.itemreward and route.reward.itemreward.activation then
+        if hasItemReward(route) then
             local item = route.reward.itemreward
             local function addItem()
                 Player.Functions.AddItem(item.itemname, item.itemamount)
@@ -150,7 +157,7 @@ local function giveRewards(src, money, route)
         end
 
         -- Give item reward if configured
-        if route and route.reward and route.reward.itemreward and route.reward.itemreward.activation then
+        if hasItemReward(route) then
             local item = route.reward.itemreward
             local function addItem()
                 inventory:addItem(src, item.itemname, item.itemamount)
@@ -213,13 +220,21 @@ lib.callback.register('stx-wagondeliveries:server:callback:startDelivery', funct
         return false
     end
 
-    local reward = calculateReward(loc, route) or 0
+    local reward = calculateReward(loc, route)
+    
+    -- Check for valid reward configuration
+    -- calculateReward returns nil if the route reward config is invalid
+    if not reward then
+        if Config.Debug then
+            print(("^3[DELIVERY] Player %d has invalid reward configuration^0"):format(src))
+        end
+        return false
+    end
     
     -- Check if there's at least some reward (money OR items)
-    local hasItemReward = route.reward and route.reward.itemreward and route.reward.itemreward.activation
-    if reward <= 0 and not hasItemReward then
+    if reward <= 0 and not hasItemReward(route) then
         if Config.Debug then
-            print(("^3[DELIVERY] Player %d has invalid reward configuration (no money or item rewards)^0"):format(src))
+            print(("^3[DELIVERY] Player %d has no rewards configured (no money or item rewards)^0"):format(src))
         end
         return false
     end
