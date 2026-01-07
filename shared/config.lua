@@ -58,7 +58,12 @@ Config.Blip = {
     blipSprite = 'blip_ambient_coach',
     
     -- Size of the blip icon (0.1 = small, 1.0 = large)
-    blipScale = 0.2
+    blipScale = 0.2,
+    
+    -- Delivery destination blip configuration
+    deliveryBlipSprite = 'blip_destination',  -- Icon for delivery destination marker
+    deliveryBlipScale = 0.2,                   -- Size of delivery destination blip
+    deliveryBlipName = 'Delivery Point'        -- Label for delivery destination
 }
 
 --[[

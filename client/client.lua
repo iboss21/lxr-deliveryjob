@@ -20,6 +20,7 @@ local isWagonDelivered = false     -- Has wagon reached destination?
 local wagonSpawned = false         -- Is wagon currently spawned?
 local wagonmodel = nil             -- Reference to spawned wagon entity
 local endcoords = nil              -- Destination coordinates for active delivery
+local deliveryBlip = nil           -- Blip marker for delivery destination
 local tempdata2 = nil              -- Temporary delivery data storage
 local tempamount = nil             -- Temporary reward amount storage
 local isCompleting = false         -- Is delivery completion in progress?
@@ -104,6 +105,14 @@ local function spawn_cart_with_gps_mission(data1, data2)
     wagonSpawned = true
     isDeliveryStarted = true
     endcoords = vector3(data2.deliveryLoc.x, data2.deliveryLoc.y, data2.deliveryLoc.z)
+    
+    -- Create destination blip on map
+    -- Native 0x554D9D53F696D002 = BlipAddForCoords
+    -- Parameter 1664425300 = blip hash for coordinate-based blips
+    deliveryBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, endcoords.x, endcoords.y, endcoords.z)
+    SetBlipSprite(deliveryBlip, joaat(Config.Blip.deliveryBlipSprite), true)
+    SetBlipScale(deliveryBlip, Config.Blip.deliveryBlipScale)
+    Citizen.InvokeNative(0x9CB1A1623062F402, deliveryBlip, Config.Blip.deliveryBlipName)  -- SetBlipName
     
     -- Set up GPS route to destination
     StartGpsMultiRoute(GetHashKey("COLOR_RED"), true, true)
@@ -231,6 +240,10 @@ RegisterNetEvent("stx-wagondeliveries:client:startDelivery", function(MainLocati
                             -- Success: Clean up and reset mission
                             Config.Notify_Client("Delivery", "Delivery completed. Payment received.", "success", 5000)
                             ClearGpsMultiRoute(endcoords)
+                            if deliveryBlip then
+                                RemoveBlip(deliveryBlip)
+                                deliveryBlip = nil
+                            end
                             endcoords = nil
                             if DoesEntityExist(wagonmodel) then
                                 DeleteVehicle(wagonmodel)
@@ -272,6 +285,10 @@ RegisterNetEvent("stx-wagondeliveries:client:cancelDelivery", function(check)
             TriggerServerEvent('stx-wagondeliveries:server:cancelDelivery')
             Config.Notify_Client("Delivery", "Mission Cancelled", "error", 5000)
             ClearGpsMultiRoute(endcoords)
+            if deliveryBlip then
+                RemoveBlip(deliveryBlip)
+                deliveryBlip = nil
+            end
             endcoords = nil
             DeleteVehicle(wagonmodel)
             wagonSpawned = false
@@ -287,6 +304,10 @@ RegisterNetEvent("stx-wagondeliveries:client:cancelDelivery", function(check)
             TriggerServerEvent('stx-wagondeliveries:server:cancelDelivery')
             Config.Notify_Client("Delivery", "Cart Delivered...", "success", 5000)
             ClearGpsMultiRoute(endcoords)
+            if deliveryBlip then
+                RemoveBlip(deliveryBlip)
+                deliveryBlip = nil
+            end
             endcoords = nil
             DeleteVehicle(wagonmodel)
             wagonSpawned = false
