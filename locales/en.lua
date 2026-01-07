@@ -1,2 +1,0 @@
-local phrases={board_open='Press ENTER to open the Freight Board',mission_start='Delivery started: %s',mission_fail='Delivery failed.',mission_complete='Delivery complete! Earned $%s',stealth_breach='Stealth breached—patrols alerted.',ambush='Ambush! Bandits attack your convoy!',wildlife='Predators stalk your wagon.'}
-function locale(k,...) local s=phrases[k] or k; if select('#',...)>0 then s=s:format(...) end return s end

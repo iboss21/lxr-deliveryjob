@@ -1,2 +1,0 @@
-local phrases={board_open='დააჭირე ENTER-ს მიწოდების დაფის გასახსნელად',mission_start='მიწოდება დაწყებულია: %s',mission_fail='მიწოდება ჩავარდა.',mission_complete='მიწოდება დასრულდა! თქვენ მიიღეთ $%s',stealth_breach='ფარული რეჟიმი დარღვეულია — პატრულები გაფრთხილებულია.',ambush='ჩასაფრება! ბანდიტები თავს გესხმიან!',wildlife='ქარავანს მტაცებლები უთვალთვალებენ.'}
-function locale(k,...) local s=phrases[k] or k; if select('#',...)>0 then s=s:format(...) end return s end
