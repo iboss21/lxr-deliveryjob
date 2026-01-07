@@ -51,7 +51,8 @@ Config.FadeIn = true
 
 Config.Blip = {
     -- Name displayed on the map for delivery locations
-    blipName = 'The Land of Wolves - Wagon Hauling',
+    -- Note: Kept concise to prevent UI truncation
+    blipName = 'Wolves Hauling',
     
     -- Sprite/icon used for the blip on the map
     blipSprite = 'blip_ambient_coach',

@@ -73,7 +73,8 @@ local function spawn_cart_with_gps_mission(data1, data2)
     local cartHash = joaat(data2.wagonModel)
     local cargoHash = joaat(data2.cargo)
     local lightHash = joaat(data2.light)
-    local cartcoords, cartheading = vector3(data1.cartSpawn.x, data1.cartSpawn.y, data1.cartSpawn.z) , data1.cartSpawn.w,
+    local cartcoords = vector3(data1.cartSpawn.x, data1.cartSpawn.y, data1.cartSpawn.z)
+    local cartheading = data1.cartSpawn.w
     
     -- Request models from game
     RequestModel(cartHash, cargoHash, lightHash)

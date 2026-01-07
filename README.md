@@ -3,8 +3,6 @@
 
 <img width="1024" height="1536" alt="The Land of Wolves - LXRCore Delivery System" src="https://github.com/user-attachments/assets/b3038f26-ae9b-4018-ad4d-16308324c037" />
 
-> **Note:** The screenshot above is a placeholder. A new branded screenshot featuring "The Land of Wolves" branding should be created and uploaded to replace this image.
-
 **Developer:** iBoss  
 **Website:** [www.wolves.land](https://www.wolves.land)  
 **Discord:** [Join Our Community](https://discord.gg/fPjSxEHFMt)
