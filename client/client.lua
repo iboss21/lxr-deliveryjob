@@ -86,6 +86,12 @@ local function spawn_cart_with_gps_mission(data1, data2)
     -- Spawn the cart with cargo and lights attached
     local cart = CreateVehicle(cartHash, cartcoords, cartheading, true, false)
     SetVehicleOnGroundProperly(cart)
+    
+    -- Configure vehicle to be driveable and prevent despawn
+    SetEntityAsMissionEntity(cart, true, true)           -- Mark as mission entity (prevents auto-despawn)
+    SetVehicleHasBeenOwnedByPlayer(cart, true)          -- Mark as player-owned (enables full interaction)
+    SetVehicleNeedsToBeHotwired(cart, false)            -- Disable hotwiring requirement
+    Citizen.InvokeNative(0x7D9EFB7AD6B19754, cart, true) -- SetVehicleExclusiveDriver (allows player control)
     Wait(200)
     SetModelAsNoLongerNeeded(cartHash)
     
