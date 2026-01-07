@@ -191,7 +191,7 @@ lib.callback.register('stx-wagondeliveries:server:callback:completeDelivery', fu
 
     -- Additional validation: check if enough time has passed since start
     local deliveryDuration = os.time() - s.startedAt
-    if deliveryDuration < 1 then
+    if deliveryDuration < Config.AntiSpam.minDeliveryDuration then
         if Config.Debug then
             print(("^3[DELIVERY] Player %d completed delivery too quickly (%.1fs) - possible exploit^0"):format(src, deliveryDuration))
         end

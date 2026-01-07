@@ -70,6 +70,8 @@ Config.AntiSpam = {
     cooldownDuration = 60,
     -- Server-side rate limit for delivery starts (seconds between attempts)
     serverRateLimit = 5,
+    -- Minimum delivery duration to prevent instant completion exploits (seconds)
+    minDeliveryDuration = 10,
 }
 
 -----
