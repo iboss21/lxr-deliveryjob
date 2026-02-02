@@ -1,175 +1,41 @@
 --[[
 ═══════════════════════════════════════════════════════════════════════════════
- ██╗  ██╗██████╗        ██████╗ ███████╗██╗     ██╗██╗   ██╗███████╗██████╗ ██╗   ██╗
- ██║  ██║██╔══██╗       ██╔══██╗██╔════╝██║     ██║██║   ██║██╔════╝██╔══██╗╚██╗ ██╔╝
- ███████║██████╔╝       ██║  ██║█████╗  ██║     ██║██║   ██║█████╗  ██████╔╝ ╚████╔╝ 
- ██╔══██║██╔══██╗       ██║  ██║██╔══╝  ██║     ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗  ╚██╔╝  
- ██║  ██║██║  ██║       ██████╔╝███████╗███████╗██║ ╚████╔╝ ███████╗██║  ██║   ██║   
- ╚═╝  ╚═╝╚═╝  ╚═╝       ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝   ╚═╝   
-═══════════════════════════════════════════════════════════════════════════════
- 🐺 Delivery Job System - Configuration
-═══════════════════════════════════════════════════════════════════════════════
- 
- A comprehensive wagon/cart delivery job system for RedM that allows players to
- transport goods across the frontier. Features multi-framework support, random
- delivery assignments, anti-exploit protection, and configurable rewards.
- Players interact with NPCs to select (or get assigned) delivery destinations,
- spawn wagons with cargo, and earn money or items upon successful delivery.
- 
-════════════════════════════════ Server Information ════════════════════════════
- Server:     The Land of Wolves 🐺 | www.wolves.land
- Community:  Georgian RP 🇬🇪 | მგლების მიწა - რჩეულთა ადგილი!
- Tagline:    ისტორია ცოცხლდება აქ! (History Lives Here!)
- Type:       Serious Hardcore Roleplay
- Access:     Discord & Whitelisted
- Website:    https://www.wolves.land
- Discord:    https://discord.gg/CrKcWdfd3A
- GitHub:     https://github.com/iBoss21
- Store:      https://theluxempire.tebex.io
- Listing:    https://servers.redm.net/servers/detail/8gj7eb
- Developer:  iBoss21 / The Lux Empire
-════════════════════════════════════════════════════════════════════════════════
- Version:    2.1.0
- Performance: Optimized for RedM (60+ FPS target)
- Tags:       Delivery Job, Economy, Multi-Framework, Anti-Exploit, RPG
-════════════════════════════════════════════════════════════════════════════════
- Framework Support (in priority order):
- ✓ LXR-Core (Primary)   - The Land of Wolves custom framework
- ✓ RSG-Core (Primary)   - RedM Script Group core framework
- ✓ VORP Core (Supported) - Vintage Outlaw Roleplay framework
-════════════════════════════════════════════════════════════════════════════════
- Credits:
- - Original System Creator: RexShack (rsg-delivery)
- - Base Concept & Logic: Muhammad Abdullah Shurjeel (stx-wagondeliveries)
- - Framework Adaptation & Enhancement: iBoss21 (The Lux Empire)
- - Land of Wolves Branding: iBoss21
-════════════════════════════════════════════════════════════════════════════════
- Copyright (c) 2024-2026 The Lux Empire / iBoss21
- Licensed under: MIT - wolves.land
+    The Land of Wolves - LXRCore Delivery System
+    Configuration File
+    
+    Developer: iBoss
+    Website: www.wolves.land
+    Discord: discord.gg/fPjSxEHFMt
+    
+    Original Creator: Muhammad Abdullah Shurjeel (stx-wagondeliveries)
+    Based on: RexShack's rsg-delivery
 ═══════════════════════════════════════════════════════════════════════════════
 ]]--
 
 Config = {}
 
--- ════════════════════════════════════════════════════════════════════════════
--- █████ RESOURCE NAME PROTECTION (MANDATORY)
--- ════════════════════════════════════════════════════════════════════════════
-
-local REQUIRED_RESOURCE_NAME = "lxr-deliveryjob"
-local currentName = GetCurrentResourceName()
-
-if currentName ~= REQUIRED_RESOURCE_NAME then
-    error(string.format([[
-
-    ^1╔════════════════════════════════════════════════════════════════════╗
-    ║                  RESOURCE NAME MISMATCH ERROR                      ║
-    ╠════════════════════════════════════════════════════════════════════╣
-    ║  This resource MUST be named: ^3%s^1                 ║
-    ║  Current resource name: ^3%s^1%s║
-    ╠════════════════════════════════════════════════════════════════════╣
-    ║  The resource name is enforced for:                                ║
-    ║   • Proper event routing and framework integration                 ║
-    ║   • Consistent exports and dependencies                            ║
-    ║   • Avoiding conflicts with other resources                        ║
-    ╠════════════════════════════════════════════════════════════════════╣
-    ║  TO FIX: Rename your resource folder to '%s'  ║
-    ║  Location: resources/[yourfolder]/lxr-deliveryjob/                 ║
-    ╚════════════════════════════════════════════════════════════════════╝
-    ^0
-    ]], REQUIRED_RESOURCE_NAME, currentName, string.rep(" ", 36 - #currentName), REQUIRED_RESOURCE_NAME))
-end
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ SERVER INFORMATION (CANONICAL LAND OF WOLVES DATA)
--- ════════════════════════════════════════════════════════════════════════════
-
-Config.ServerInfo = {
-    name          = 'The Land of Wolves 🐺',
-    tagline       = 'Georgian RP 🇬🇪 | მგლების მიწა - რჩეულთა ადგილი!',
-    description   = 'ისტორია ცოცხლდება აქ!', -- History Lives Here!
-    type          = 'Serious Hardcore Roleplay',
-    access        = 'Discord & Whitelisted',
-    website       = 'https://www.wolves.land',
-    discord       = 'https://discord.gg/CrKcWdfd3A',
-    github        = 'https://github.com/iBoss21',
-    store         = 'https://theluxempire.tebex.io',
-    serverListing = 'https://servers.redm.net/servers/detail/8gj7eb',
-    developer     = 'iBoss21 / The Lux Empire',
-    tags          = {'RedM','Georgian','SeriousRP','Whitelist','Economy','RPG','Delivery'}
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ FRAMEWORK CONFIGURATION (MULTI-FRAMEWORK AUTO-DETECTION)
--- ════════════════════════════════════════════════════════════════════════════
-
 --[[
-    Framework Priority (in detection order):
-    1. LXR-Core  - Primary framework for Land of Wolves
-    2. RSG-Core  - Primary co-framework for RedM scripts
-    3. VORP Core - Supported legacy framework
-    
-    Set to 'auto' for automatic detection, or manually specify: 'LXR', 'RSG', 'VORP'
+═══════════════════════════════════════════════════════════════════════════════
+    GENERAL SETTINGS
+═══════════════════════════════════════════════════════════════════════════════
 ]]--
 
-Config.Framework = 'auto' -- Options: 'auto', 'LXR', 'RSG', 'VORP'
-
-Config.FrameworkSettings = {
-    LXR = {
-        resourceName = 'lxr-core',
-        events = {
-            playerLoaded = 'lxr-core:client:player:loaded',
-            playerUnload = 'lxr-core:client:player:unloaded',
-            jobUpdate = 'lxr-core:client:job:update',
-        },
-        callbacks = {
-            hasItem = 'lxr-core:server:hasItem',
-        }
-    },
-    RSG = {
-        resourceName = 'rsg-core',
-        events = {
-            playerLoaded = 'RSGCore:Client:OnPlayerLoaded',
-            playerUnload = 'RSGCore:Client:OnPlayerUnload',
-            jobUpdate = 'RSGCore:Client:OnJobUpdate',
-        },
-        callbacks = {
-            hasItem = 'RSGCore:Server:HasItem',
-        }
-    },
-    VORP = {
-        resourceName = 'vorp_core',
-        coreExport = 'vorp_core:GetCore',
-        events = {
-            playerLoaded = 'vorp:SelectedCharacter',
-            playerUnload = 'vorp:PlayerLogout',
-        }
-    }
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ LANGUAGE / LOCALIZATION
--- ════════════════════════════════════════════════════════════════════════════
-
-Config.Lang = 'en' -- Options: 'en', 'ka' (Georgian), 'es', 'fr', 'de', etc.
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ GENERAL SETTINGS
--- ════════════════════════════════════════════════════════════════════════════
-
--- Enable debug mode for verbose console logging (useful for troubleshooting)
+-- Enable debug mode for console logging (useful for troubleshooting)
 Config.Debug = false
 
--- Legacy framework name for backward compatibility
--- Will be overridden by Framework adapter at runtime
-Config.Core = "RSG" -- Options: "RSG", "VORP" (Legacy - use Config.Framework instead)
+-- Framework Selection: Choose your server framework
+-- Options: "RSG" (RSGCore) or "VORP" (VORP Framework)
+Config.Core = "RSG"
 
 -- Interaction System: Choose how players interact with delivery NPCs
--- Options: "prompt" (native RedM prompts) | "murphy_interact" | "target" (WIP)
+-- Options: "prompt" (native RedM prompts) | "murphy_interact" (Murphy Interaction) | "target" (WIP - not yet implemented)
 Config.Interact = "murphy_interact"
 
--- ════════════════════════════════════════════════════════════════════════════
--- █████ NPC CONFIGURATION
--- ════════════════════════════════════════════════════════════════════════════
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    NPC SETTINGS
+═══════════════════════════════════════════════════════════════════════════════
+]]--
 
 -- Distance at which NPCs will spawn around the player (in game units)
 Config.DistanceSpawn = 30.0
@@ -177,164 +43,39 @@ Config.DistanceSpawn = 30.0
 -- Enable smooth fade-in effect when NPCs spawn/despawn
 Config.FadeIn = true
 
--- ════════════════════════════════════════════════════════════════════════════
--- █████ MAP BLIPS / MARKERS
--- ════════════════════════════════════════════════════════════════════════════
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    BLIP (MAP MARKER) SETTINGS
+═══════════════════════════════════════════════════════════════════════════════
+]]--
 
 Config.Blip = {
-    -- Delivery hub/NPC location blip
+    -- Name displayed on the map for delivery locations
+    -- Note: Kept concise to prevent UI truncation
     blipName = 'Wolves Hauling',
+    
+    -- Sprite/icon used for the blip on the map
     blipSprite = 'blip_ambient_coach',
+    
+    -- Size of the blip icon (0.1 = small, 1.0 = large)
     blipScale = 0.2,
     
-    -- Active delivery destination blip
-    deliveryBlipSprite = 'blip_destination',
-    deliveryBlipScale = 0.2,
-    deliveryBlipName = 'Delivery Point'
+    -- Delivery destination blip configuration
+    deliveryBlipSprite = 'blip_destination',  -- Icon for delivery destination marker
+    deliveryBlipScale = 0.2,                   -- Size of delivery destination blip
+    deliveryBlipName = 'Delivery Point'        -- Label for delivery destination
 }
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ KEYS / CONTROLS
--- ════════════════════════════════════════════════════════════════════════════
-
-Config.Keys = {
-    -- No specific key bindings required currently
-    -- Interactions handled by prompt/murphy_interact systems
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ COOLDOWNS / TIMING
--- ════════════════════════════════════════════════════════════════════════════
-
-Config.Cooldowns = {
-    -- Minimum time (seconds) between delivery completions
-    deliveryComplete = 5,
-    
-    -- Cooldown after canceling a delivery
-    deliveryCancel = 30,
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ ECONOMY / REWARDS
--- ════════════════════════════════════════════════════════════════════════════
-
--- Account type for money rewards
--- RSG/LXR options: "cash", "bank"
--- VORP options: 0 (cash), 1 (gold)
-Config.Reward_Money_Account = "cash"
-
--- Show reward amount in the delivery selection menu
--- Set to false to hide payment amounts from players (creates mystery/surprise)
-Config.Show_Reward_Money_inMenu = false
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ DELIVERY SYSTEM MODES
--- ════════════════════════════════════════════════════════════════════════════
 
 --[[
-    RANDOM DELIVERY MODE
+═══════════════════════════════════════════════════════════════════════════════
+    NOTIFICATION SYSTEM
     
-    When enabled, destinations are randomly assigned instead of player choice.
-    This creates more variety and prevents players from always cherry-picking
-    the highest-paying routes, promoting balanced economy.
+    This section handles all in-game notifications to players.
+    Uses BLN_NOTIFY system for consistent messaging across the server.
+═══════════════════════════════════════════════════════════════════════════════
 ]]--
 
--- Enable random destination assignment (players cannot choose specific route)
-Config.RandomDelivery = true
-
--- Hide destination names in menus and notifications (adds mystery element)
-Config.RandomDelivery_HideDestinationText = true
-
--- Hide reward amount previews before delivery completion (surprise factor)
-Config.RandomDelivery_HideRewardPreview = true
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ COMMANDS
--- ════════════════════════════════════════════════════════════════════════════
-
--- Command players can use to cancel their active delivery
-Config.CancelDelivery_Command = "canceldelivery"
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ SECURITY / ANTI-EXPLOIT SETTINGS
--- ════════════════════════════════════════════════════════════════════════════
-
---[[
-    These settings prevent players from abusing the delivery system through:
-    - Menu spam attacks (opening menu repeatedly)
-    - Rapid delivery completion exploits
-    - Instant teleport/completion cheats
-    - Server performance degradation
-    - Reward manipulation
-    
-    All validation is done SERVER-SIDE for security.
-]]--
-
-Config.AntiSpam = {
-    -- Maximum number of times a player can open the delivery menu within detection window
-    -- Exceeding this triggers cooldown
-    maxMenuOpens = 3,
-    
-    -- Time window (seconds) to track menu open attempts
-    -- Example: 3 menu opens within 10 seconds = spam detected
-    detectionWindow = 10,
-    
-    -- Cooldown duration (seconds) after spam is detected
-    -- Player cannot interact with delivery system until cooldown expires
-    cooldownDuration = 60,
-    
-    -- Server-side rate limit for starting deliveries (seconds between attempts)
-    -- Prevents rapid-fire delivery starts that could exploit the system
-    serverRateLimit = 5,
-    
-    -- Minimum time (seconds) a delivery must take to be considered valid
-    -- Prevents instant completion exploits (teleporting to destination)
-    -- Adjust based on your map size and typical delivery times
-    -- Recommendation: Set to at least 50% of fastest legitimate delivery time
-    minDeliveryDuration = 10,
-}
-
-Config.Security = {
-    -- Validate delivery locations server-side (prevent fake coordinates)
-    validateLocations = true,
-    
-    -- Maximum distance player can be from cart to complete delivery (units)
-    maxDeliveryDistance = 10.0,
-    
-    -- Log suspicious delivery attempts to server console
-    logSuspiciousActivity = true,
-    
-    -- Require player to be on-foot (not in vehicle) for completion
-    requireOnFoot = false,
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ PERFORMANCE OPTIMIZATION
--- ════════════════════════════════════════════════════════════════════════════
-
-Config.Performance = {
-    -- Update rate for distance checks (milliseconds)
-    -- Higher = better performance, lower = more responsive
-    distanceCheckInterval = 500,
-    
-    -- Cache player data to reduce framework calls
-    cachePlayerData = true,
-    cacheDuration = 60, -- seconds
-    
-    -- Limit number of active deliveries server-wide (0 = unlimited)
-    maxActiveDeliveries = 0,
-}
-
--- ════════════════════════════════════════════════════════════════════════════
--- █████ NOTIFICATION SYSTEM
--- ════════════════════════════════════════════════════════════════════════════
-
---[[
-    Notification system using BLN_NOTIFY for consistent messaging.
-    Customize the notification functions below to match your preferred system.
-]]--
-
--- Internal helper: Convert notification types to BLN templates
+-- Internal helper function to convert notification types to BLN templates
 local function _blnTemplateFromType(notitype)
     notitype = (notitype or "info"):lower()
     if notitype == "success" then return "SUCCESS" end
@@ -346,8 +87,8 @@ end
 -- Client-side notification function
 -- @param title: Notification title
 -- @param text: Notification message content
--- @param notitype: Type ("success", "error", "warning", "info")
--- @param duration: Display duration (milliseconds)
+-- @param notitype: Type of notification ("success", "error", "warning", "info")
+-- @param duration: How long notification displays (in milliseconds)
 Config.Notify_Client = function(title, text, notitype, duration)
     TriggerEvent('bln_notify:send', {
         title = title or '',
@@ -359,11 +100,11 @@ Config.Notify_Client = function(title, text, notitype, duration)
 end
 
 -- Server-side notification function (sends to specific player)
--- @param id: Player server ID
+-- @param id: Player server ID to send notification to
 -- @param title: Notification title
 -- @param text: Notification message content
--- @param notitype: Type ("success", "error", "warning", "info")
--- @param duration: Display duration (milliseconds)
+-- @param notitype: Type of notification ("success", "error", "warning", "info")
+-- @param duration: How long notification displays (in milliseconds)
 Config.Notify_Server = function(id, title, text, notitype, duration)
     TriggerClientEvent('bln_notify:send', id, {
         title = title or '',
@@ -374,49 +115,89 @@ Config.Notify_Server = function(id, title, text, notitype, duration)
     }, _blnTemplateFromType(notitype))
 end
 
--- ════════════════════════════════════════════════════════════════════════════
--- █████ DELIVERY LOCATIONS & ROUTES CONFIGURATION
--- ════════════════════════════════════════════════════════════════════════════
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    DELIVERY SYSTEM CONFIGURATION
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
+-- Account type for money rewards
+-- RSG options: "cash", "bank"
+-- VORP options: 0 (cash), 1 (gold)
+Config.Reward_Money_Account = "cash"
+
+-- Command players can use to cancel active deliveries
+Config.CancelDelivery_Command = "canceldelivery"
+
+-- Show reward amount in the delivery selection menu
+-- Set to false to hide payment amounts from players
+Config.Show_Reward_Money_inMenu = false
 
 --[[
-    DELIVERY SYSTEM STRUCTURE:
+═══════════════════════════════════════════════════════════════════════════════
+    RANDOM DELIVERY MODE
     
-    Each main location (delivery hub) has:
-    - label: Display name for the hub
-    - npcmodel: Ped model for the delivery NPC
-    - npccoords: NPC spawn position (x, y, z, heading)
-    - cartSpawn: Where the delivery wagon spawns (x, y, z, heading)
-    - deliveries: Array of available routes from this hub
-    
-    Each delivery route has:
-    - label: Route display name
-    - description: Route description
-    - reward: Reward configuration (see below)
-    - wagonModel: Wagon model to spawn
-    - cargo: Cargo prop to attach
-    - light: Light upgrade prop to attach
-    - deliveryLoc: Destination coordinates (x, y, z)
-    
-    REWARD SYSTEM:
-    
-    priceByDistance: Distance-based rewards
-        - activation: true/false (enable/disable)
-        - multiplier: Payment per 100 units of distance
-        - Example: 1000 units @ 0.01 multiplier = $10
-    
-    priceByConfig: Fixed price rewards
-        - activation: true/false (enable/disable)
-        - price: Fixed amount paid for delivery
-    
-    itemreward: Item-based rewards
-        - activation: true/false (enable/disable)
-        - itemname: Item to give (must exist in your framework/inventory)
-        - itemamount: Number of items (can use math.random for variety)
-        - chance: Percentage chance (1-100), or nil for guaranteed reward
-    
-    NOTE: Only ONE price method should be active at a time (distance OR config)
-          Item rewards can be used alongside or instead of money rewards
+    When enabled, destinations are randomly assigned instead of player choice.
+    This creates more variety and prevents players from always choosing the 
+    highest-paying routes.
+═══════════════════════════════════════════════════════════════════════════════
 ]]--
+
+-- Enable random destination assignment (players cannot choose)
+Config.RandomDelivery = true
+
+-- Hide destination names in menus and notifications
+Config.RandomDelivery_HideDestinationText = true
+
+-- Hide reward amount previews before delivery completion
+Config.RandomDelivery_HideRewardPreview = true
+
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    ANTI-SPAM & ANTI-EXPLOIT SETTINGS
+    
+    These settings prevent players from abusing the delivery system through:
+    - Menu spam attacks
+    - Rapid delivery completion exploits
+    - Instant teleport/completion cheats
+    - Server load from excessive requests
+═══════════════════════════════════════════════════════════════════════════════
+]]--
+
+Config.AntiSpam = {
+    -- Maximum number of times a player can open the delivery menu within the detection window
+    -- If exceeded, player is put on cooldown
+    maxMenuOpens = 3,
+    
+    -- Time window (in seconds) to track menu open attempts
+    -- Example: 3 menu opens within 10 seconds = spam detected
+    detectionWindow = 10,
+    
+    -- Cooldown duration (in seconds) after spam is detected
+    -- Player cannot open menu again until cooldown expires
+    cooldownDuration = 60,
+    
+    -- Server-side rate limit for starting deliveries (seconds between attempts)
+    -- Prevents rapid-fire delivery starts that could exploit the system
+    serverRateLimit = 5,
+    
+    -- Minimum time (in seconds) a delivery must take to be valid
+    -- Prevents instant completion exploits (teleporting to destination)
+    -- Adjust based on your map size and typical delivery times
+    minDeliveryDuration = 10,
+}
+
+--[[
+═══════════════════════════════════════════════════════════════════════════════
+    DELIVERY LOCATIONS & ROUTES CONFIGURATION
+    
+    This is where you define all delivery locations, NPCs, and routes.
+    
+    STRUCTURE:
+    - Each main location has its own NPC and cart spawn point
+    - Each location can have multiple delivery routes to other towns
+    - Rewards can be based on distance OR fixed prices
+    - Item rewards can be given with optional chance percentage
     
     REWARD SYSTEM EXPLAINED:
     
@@ -1535,70 +1316,8 @@ Config.Deliveries = {
     },
 }
 
--- ════════════════════════════════════════════════════════════════════════════
--- █████ DEBUG & DEVELOPMENT SETTINGS
--- ════════════════════════════════════════════════════════════════════════════
 
-Config.Debug = {
-    -- Enable verbose console logging for troubleshooting
-    enabled = false,
-    
-    -- Log all delivery events (start, complete, cancel)
-    logDeliveries = false,
-    
-    -- Log player interactions with NPCs
-    logInteractions = false,
-    
-    -- Log reward calculations
-    logRewards = false,
-    
-    -- Log framework detection and initialization
-    logFramework = false,
-    
-    -- Show delivery coordinates in console (helps with setup)
-    showCoordinates = false,
-}
 
--- ════════════════════════════════════════════════════════════════════════════
--- █████ END OF CONFIGURATION
--- ════════════════════════════════════════════════════════════════════════════
 
---[[
-═══════════════════════════════════════════════════════════════════════════════
-   ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗
-   ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║
-   ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║
-   ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║
-   ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║
-   ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝
-═══════════════════════════════════════════════════════════════════════════════
-  Configuration Successfully Loaded!
-  
-  🐺 LXR Delivery Job System - Ready for Service
-  🚚 Delivery hubs configured and operational
-  💰 Economy system initialized
-  🛡️ Anti-exploit protection enabled
-  
-  Visit: wolves.land | Discord: discord.gg/CrKcWdfd3A
-  Developer: iBoss21 / The Lux Empire
-═══════════════════════════════════════════════════════════════════════════════
-]]--
 
--- Print startup banner to server console
-if IsDuplicityVersion() then
-    print("^2═══════════════════════════════════════════════════════════════^0")
-    print("^3  🐺 LXR Delivery Job System^0")
-    print("^2═══════════════════════════════════════════════════════════════^0")
-    print("^6  Version: 2.1.0^0")
-    print("^6  Server: The Land of Wolves 🐺^0")
-    print("^6  Framework: " .. (Config.Framework or "auto") .. "^0")
-    print("^6  Developer: iBoss21 / The Lux Empire^0")
-    print("^2═══════════════════════════════════════════════════════════════^0")
-    print("^2  ✓ Configuration loaded successfully^0")
-    print("^2  ✓ " .. #Config.Deliveries .. " delivery hubs configured^0")
-    print("^2  ✓ Anti-spam protection enabled^0")
-    print("^2  ✓ System ready for player interactions^0")
-    print("^2═══════════════════════════════════════════════════════════════^0")
-    print("^5  wolves.land | discord.gg/CrKcWdfd3A^0")
-    print("^2═══════════════════════════════════════════════════════════════^0")
-end
+
