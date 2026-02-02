@@ -1,17 +1,50 @@
 --[[
 ═══════════════════════════════════════════════════════════════════════════════
-    The Land of Wolves - LXRCore Delivery System
-    Server-Side Script
-    
-    Developer: iBoss
-    Website: www.wolves.land
-    
-    This script handles:
-    - Server-side delivery validation
-    - Anti-exploit delivery sessions (one active delivery per player)
-    - Reward calculations and distribution
-    - Framework integration (RSG/VORP)
-    - Rate limiting and spam prevention
+ ██╗     ██╗  ██╗██████╗        ██████╗ ███████╗██╗     ██╗██╗   ██╗███████╗██████╗ ██╗   ██╗
+ ██║     ╚██╗██╔╝██╔══██╗       ██╔══██╗██╔════╝██║     ██║██║   ██║██╔════╝██╔══██╗╚██╗ ██╔╝
+ ██║      ╚███╔╝ ██████╔╝       ██║  ██║█████╗  ██║     ██║██║   ██║█████╗  ██████╔╝ ╚████╔╝ 
+ ██║      ██╔██╗ ██╔══██╗       ██║  ██║██╔══╝  ██║     ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗  ╚██╔╝  
+ ███████╗██╔╝ ██╗██║  ██║       ██████╔╝███████╗███████╗██║ ╚████╔╝ ███████╗██║  ██║   ██║   
+ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝       ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝   ╚═╝   
+═══════════════════════════════════════════════════════════════════════════════
+ 🐺 Server-Side Validation - Secure Delivery Processing
+═══════════════════════════════════════════════════════════════════════════════
+ 
+ This server script provides secure validation and processing for delivery jobs,
+ implementing anti-exploit delivery sessions (one active per player), reward
+ calculations and distribution, multi-framework integration (LXR/RSG/VORP),
+ rate limiting, and comprehensive spam prevention measures.
+ 
+════════════════════════════════ Server Information ════════════════════════════
+ Server:     The Land of Wolves 🐺 | www.wolves.land
+ Community:  Georgian RP 🇬🇪 | მგლების მიწა - რჩეულთა ადგილი!
+ Tagline:    ისტორია ცოცხლდება აქ! (History Lives Here!)
+ Type:       Serious Hardcore Roleplay
+ Access:     Discord & Whitelisted
+ Website:    https://www.wolves.land
+ Discord:    https://discord.gg/CrKcWdfd3A
+ GitHub:     https://github.com/iBoss21
+ Store:      https://theluxempire.tebex.io
+ Listing:    https://servers.redm.net/servers/detail/8gj7eb
+ Developer:  iBoss21 / The Lux Empire
+════════════════════════════════════════════════════════════════════════════════
+ Version:    2.1.0
+ Performance: Optimized for RedM (60+ FPS target)
+ Tags:       Delivery Job, Server Logic, Anti-Exploit, Economy, Security
+════════════════════════════════════════════════════════════════════════════════
+ Framework Support (in priority order):
+ ✓ LXR-Core (Primary)   - The Land of Wolves custom framework
+ ✓ RSG-Core (Primary)   - RedM Script Group core framework
+ ✓ VORP Core (Supported) - Vintage Outlaw Roleplay framework
+════════════════════════════════════════════════════════════════════════════════
+ Credits:
+ - Original System Creator: RexShack (rsg-delivery)
+ - Base Concept & Logic: Muhammad Abdullah Shurjeel (stx-wagondeliveries)
+ - Framework Adaptation & Enhancement: iBoss21 (The Lux Empire)
+ - Land of Wolves Branding: iBoss21
+════════════════════════════════════════════════════════════════════════════════
+ Copyright (c) 2024-2026 The Lux Empire / iBoss21
+ Licensed under: MIT - wolves.land
 ═══════════════════════════════════════════════════════════════════════════════
 ]]--
 
